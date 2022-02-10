@@ -10,8 +10,12 @@ def split_string(x):
     return first, last
 
 
-def l(n):
+def doubler(n):
     return 2*n
+
+
+def singler(n):
+    return n
 # this is our one-way function f(x)=discrete logarithm
 
 
@@ -30,8 +34,8 @@ def g(x):
     return gen + last + str(hc_bit)
 
 
-def gen(x):
-    length = l(len(x))
+def gen(x, p=doubler):
+    length = p(len(x))
     result = ""
     seed = x
     for i in range(length):

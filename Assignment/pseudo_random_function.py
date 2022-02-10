@@ -9,7 +9,7 @@ def F(k, x):
         x (string): input string
     """
     # generate random seed of 2n bits
-    seed = k.zfill(SEED_SIZE*2)
+    seed = k.zfill(len(k))
     for i in range(len(x)):
         first, last = split_string(seed)
         if int(x[i]) == 0:
@@ -17,4 +17,6 @@ def F(k, x):
         else:
             seed = gen(last)
     return seed
-print(F("11010101","11011001"))
+
+
+print(F("11010101".zfill(16), "11011001"))

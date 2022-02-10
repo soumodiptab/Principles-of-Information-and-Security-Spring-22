@@ -22,7 +22,7 @@ def encrypt(nonce, message):
     chunks = [message[i:i+CHUNK_LENGTH]
               for i in range(0, len(message), CHUNK_LENGTH)]
     # nonce
-    r = gen(nonce.zfill(SEED_SIZE))
+    r = gen(nonce.zfill(len(nonce)), singler)
     propagator = r
     cipher_text = []
     print("encrypt: ")
@@ -46,7 +46,7 @@ def decrypt(r, cipher_text):
     return message
 
 
-r, c = encrypt("10110110", "1000010101000101111")
+r, c = encrypt("10110110".zfill(16), "1000010101000101111")
 print(f"r= {r}\ncipher= {c}\n")
 m = decrypt(r, c)
 print(f"m= {''.join(m)}")
