@@ -44,6 +44,6 @@ def gen(x, p=doubler):
     return result
 
 
-test_string = "1000011"
-seed = test_string.zfill(SEED_SIZE)
-print(gen(seed))
+# test_string = "1000011"
+# seed = test_string.zfill(SEED_SIZE)
+# print(gen(seed))

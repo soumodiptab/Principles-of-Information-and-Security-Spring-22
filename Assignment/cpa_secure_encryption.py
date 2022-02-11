@@ -46,7 +46,7 @@ def decrypt(r, cipher_text):
     return message
 
 
-r, c = encrypt("10110110".zfill(16), "1000010101000101111")
-print(f"r= {r}\ncipher= {c}\n")
-m = decrypt(r, c)
-print(f"m= {''.join(m)}")
+# r, c = encrypt("10110110".zfill(16), "1000010101000101111")
+# print(f"r= {r}\ncipher= {c}\n")
+# m = decrypt(r, c)
+# print(f"m= {''.join(m)}")

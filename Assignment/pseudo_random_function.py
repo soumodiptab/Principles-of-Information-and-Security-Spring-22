@@ -1,6 +1,5 @@
 from pseudo_random_gen import *
 
-
 def F(k, x):
     """F : Pseudo random function
 
