@@ -18,4 +18,4 @@ def F(k, x):
     return seed
 
 
-print(F("11010101".zfill(16), "11011001"))
+# print(F("11010101".zfill(16), "11011001"))
