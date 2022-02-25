@@ -17,8 +17,6 @@ def doubler(n):
 def singler(n):
     return n
 # this is our one-way function f(x)=discrete logarithm
-
-
 def f(x):
     return bin(pow(GENERATOR, int(x, 2), MOD)).replace('0b', '').zfill(SEED_SIZE)
 
@@ -42,6 +40,10 @@ def gen(x, p=doubler):
         seed = g(seed)
         result += seed[-1]
     return result
+
+
+def PRG_single(x):
+    return gen(x, p=singler)
 
 
 # test_string = "1000011"
