@@ -2,6 +2,20 @@ from pseudo_random_gen import *
 import time
 
 
+def add_zeros_at_end(string, padding_size):
+    return string[::-1].zfill(padding_size)[::-1]
+
+
+def add_zeros_at_front(string, padding_size):
+    return string.zfill(padding_size)
+
+
+def split_text(message, block_size):
+    chunks = [message[i:i+block_size]
+              for i in range(0, len(message), block_size)]
+    return chunks
+
+
 def xor(bin_x, bin_y):
     '''
     xor of the two binary strings
@@ -9,7 +23,7 @@ def xor(bin_x, bin_y):
     return "".join(str(ord(x) ^ ord(y)).replace('0b', '') for x, y in zip(bin_x, bin_y))
 
 
-def dec_to_bin(x):
+def dec_to_bin_wo_pad(x):
     """dec_to_bin converts decimal to binary
 
     Args:
@@ -28,6 +42,10 @@ def dec_to_bin(x, size):
     return bin(x).replace('0b', '').zfill(size)
 
 
+def bin_to_dec(x):
+    return int(x, 2)
+
+
 def get_random_bits(size):
     '''
     Generate random binary string of specified bits
@@ -36,10 +54,6 @@ def get_random_bits(size):
     in_binary = dec_to_bin(now, size)
     random_identifier = gen(in_binary, singler)
     return random_identifier
-
-
-def bin_to_dec(x):
-    return int(x, 2)
 
 
 def randint(low, high):
@@ -53,3 +67,12 @@ def randint(low, high):
     in_dec = bin_to_dec(random_val)
     final = low+in_dec % range
     return final
+
+
+def str_to_bin(s):
+    return dec_to_bin_wo_pad(int.from_bytes(s.encode(), 'big'))
+
+
+def bin_to_str(n):
+    x = bin_to_dec(n)
+    return x.to_bytes((x.bit_length() + 7) // 8, 'big').decode()

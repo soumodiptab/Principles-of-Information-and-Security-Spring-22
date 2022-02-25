@@ -34,8 +34,8 @@ def cbc_mac(k, message):
 def cbc_mac_verify(k, message, tag):
     generated_tag = cbc_mac(k, message)
     if generated_tag == tag:
-        return 1
-    return 0
+        return True
+    return False
 
 
 def test():

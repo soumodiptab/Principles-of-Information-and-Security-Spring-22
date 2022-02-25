@@ -1,36 +1,7 @@
-from random import randint, getrandbits
+from crypto_utils import bin_to_dec, dec_to_bin, split_text, add_zeros_at_end, xor
+from random import randint
+import math
 # Building a Hash Function with the help of Discrete log
-BLOCK_SIZE = 16
-p = 582839576166181962101771435851
-q = (p-1)/2
-# convert dec to binary
-
-
-def add_zeros_at_end(string, padding_size):
-    return string[::-1].zfill(padding_size)[::-1]
-
-
-def add_zeros_at_front(string, padding_size):
-    return string.zfill(padding_size)
-
-
-def dec_to_bin(x, size):
-    return bin(x).replace('0b', '').zfill(size)
-# convert binary to dec
-
-
-def bin_to_dec(x):
-    return int(x, 2)
-
-
-def xor(bin_x, bin_y):
-    return "".join(str(ord(x) ^ ord(y)).replace('0b', '') for x, y in zip(bin_x, bin_y))
-
-
-def split_text(message, block_size):
-    chunks = [message[i:i+block_size]
-              for i in range(0, len(message), block_size)]
-    return chunks
 
 
 def gen_prime(size):
@@ -47,28 +18,66 @@ def generator(q):
             break
     return g
 
-# hash using DLP
+
+def get_group_parameters():
+    p = 65521
+    q = (p-1)//2
+    g = generator(q)
+    h = randint(0, q-1)
+    while h == g:
+        h = randint(0, q-1)
+    return p, q, g, h
 
 
 def hash(x1, x2, g, h, p):
-    return pow(g, x1, p)*pow(h, x2, p)
-
-
-def merkle_damgard(iv, message, q):
-    return merkle_damgard(iv, message, q, len(message))
+    return (pow(g, x1, p)*pow(h, x2, p)) % p
 
 
 def merkle_damgard(iv, message, p, q, g, h):
     SIZE = len(iv)
-    encoded_size = dec_to_bin(SIZE, SIZE)
+    encoded_size = dec_to_bin(len(message), SIZE)
     messages = split_text(message, SIZE)
-    messages[-1] = add_zeros_at_end(messages[-1])
+    messages[-1] = add_zeros_at_end(messages[-1], SIZE)
     messages.append(encoded_size)
-    x1 = iv
-    for x2 in messages:
-        x1 = hash(x1, x2, g, h, p)
-    return x1
+    x1 = bin_to_dec(iv)
+    for m in messages:
+        x2 = bin_to_dec(m)
+        x1 = hash(x1, x2, g, h, p) % q
+    return dec_to_bin(x1, SIZE)
+
+
+def repeat_string(inp, length):
+    l = len(inp)
+    mult = math.ceil(length/l)
+    return mult*inp
+
+
+def hmac(k, iv, message):
+    SIZE = len(iv)
+    ipad = dec_to_bin(0x34, SIZE)
+    opad = dec_to_bin(0x5C, SIZE)
+    ipad_repeat = repeat_string(ipad, len(k))
+    xored_key = xor(k, ipad_repeat)
+    hash_init =hash(iv,xored_key,g,h,p)
+    merkle_damgard()
+
+
+def hmac_verify(iv, message):
+    pass
 
 
 def hash_demo():
-    bits = int(input('Enter number of bits >>\n'))
+    p, q, g, h = get_group_parameters()
+    x1 = randint(0, q-1)
+    x2 = randint(0, q-1)
+    if x1 == x2:
+        x2 = randint(0, q-1)
+    print(x1)
+    print(x2)
+    hash_val = hash(x1, x2, g, h, p)
+    print(hash_val)
+
+
+p, q, g, h = get_group_parameters()
+
+hash_demo()
