@@ -33,16 +33,22 @@ def hash(x1, x2, g, h, p):
     return (pow(g, x1, p)*pow(h, x2, p)) % p
 
 
+def hash_wrapper(x1, x2, g, h, p):
+    x1_dec = bin_to_dec(x1)
+    x2_dec = bin_to_dec(x2)
+    return dec_to_bin(hash(x1_dec, x2_dec, g, h, p), len(x1))
+
+
 def merkle_damgard(iv, message, p, q, g, h):
     SIZE = len(iv)
     encoded_size = dec_to_bin(len(message), SIZE)
     messages = split_text(message, SIZE)
     messages[-1] = add_zeros_at_end(messages[-1], SIZE)
     messages.append(encoded_size)
-    x1 = bin_to_dec(iv)
+    x1 = iv
     for m in messages:
-        x2 = bin_to_dec(m)
-        x1 = hash(x1, x2, g, h, p) % q
+        x2 = m
+        x1 = hash_wrapper(x1, x2, g, h, p)
     return dec_to_bin(x1, SIZE)
 
 
@@ -57,9 +63,14 @@ def hmac(k, iv, message):
     ipad = dec_to_bin(0x34, SIZE)
     opad = dec_to_bin(0x5C, SIZE)
     ipad_repeat = repeat_string(ipad, len(k))
-    xored_key = xor(k, ipad_repeat)
-    hash_init =hash(iv,xored_key,g,h,p)
-    merkle_damgard()
+    opad_repeat = repeat_string(opad, len(k))
+    xored_ipad = xor(k, ipad_repeat)
+    xored_opad = xor(k, opad_repeat)
+    hash_init = hash_wrapper(iv, xored_ipad, g, h, p)
+    hash_pre_final = hash_wrapper(iv, xored_opad, g, h, p)
+    hash_val = merkle_damgard(hash_init, message, p, q, g, h)
+    final_hash = hash_wrapper(hash_pre_final, hash_val, g, h, p)
+    return final_hash
 
 
 def hmac_verify(iv, message):
