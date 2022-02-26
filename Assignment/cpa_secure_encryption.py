@@ -1,4 +1,5 @@
-from pseudo_random_function import F, PRG_single
+from pseudo_random_function import F
+from pseudo_random_gen import PRG_single
 from crypto_utils import get_random_bits, xor
 # using output feedback mode
 # we should have a private key that we will use on both sides
@@ -47,9 +48,9 @@ def test():
     nonce = get_random_bits(16)
     orig_message = "100001000101111000001001"
     r, c = encrypt(nonce, orig_message, CHUNK_LENGTH, PRIVATE_KEY)
-    #print(f"r= {r}\ncipher= {c}\n")
+    # print(f"r= {r}\ncipher= {c}\n")
     m = decrypt(r, c, CHUNK_LENGTH, PRIVATE_KEY)
-    #print(f"m= {m}")
+    # print(f"m= {m}")
     if orig_message == m:
         print("CPA working")
     else:

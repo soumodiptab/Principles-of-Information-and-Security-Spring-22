@@ -1,4 +1,4 @@
-from pseudo_random_gen import *
+from pseudo_random_gen import gen, singler
 import time
 
 

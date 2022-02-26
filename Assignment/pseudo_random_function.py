@@ -1,4 +1,5 @@
-from pseudo_random_gen import *
+from pseudo_random_gen import gen, split_string
+
 
 def F(k, x):
     """F : Pseudo random function
