@@ -1,4 +1,4 @@
-from pseudo_random_gen import PRG_single
+from pseudo_random_gen import PRG_single, gen, split_string
 from cpa_secure_encryption import encrypt, decrypt
 from message_authentication_code import cbc_mac, cbc_mac_verify
 from crypto_utils import get_random_bits
@@ -8,8 +8,10 @@ from crypto_utils import get_random_bits
 
 
 def Gen(init):
-    key1 = get_random_bits(len(init))
-    key2 = get_random_bits(len(init))
+    key = gen(init)
+    init1, init2 = split_string(key)
+    key1 = PRG_single(init1)
+    key2 = PRG_single(init2)
     return key1, key2
 
 
@@ -36,7 +38,7 @@ def test():
 
     r, c, tag = Encrypt(k1, k2, orig_message, CHUNK_LENGTH, PRIVATE_KEY)
     #print(f"r= {r}\ncipher= {c}\n")
-    m = Decrypt(r,k2, c,CHUNK_LENGTH,PRIVATE_KEY,tag)
+    m = Decrypt(r, k2, c, CHUNK_LENGTH, PRIVATE_KEY, tag)
     #print(f"m= {m}")
     if orig_message == m:
         print("CCA working")

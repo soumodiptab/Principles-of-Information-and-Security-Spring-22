@@ -73,8 +73,12 @@ def hmac(k, iv, message):
     return final_hash
 
 
-def hmac_verify(iv, message):
-    pass
+def hmac_verify(k, iv, message, tag):
+    gen_tag = hmac(k, iv, message)
+    if gen_tag == tag:
+        return True
+    else:
+        return False
 
 
 def hash_demo():

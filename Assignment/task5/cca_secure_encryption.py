@@ -213,6 +213,7 @@ def get_random_bits(size):
     random_identifier = gen(in_binary, singler)
     return random_identifier
 
+
 def cbc_mac(k, message):
     """Calculates MAC tag using Cipher Block Chaining
     Args:
@@ -249,40 +250,80 @@ def cbc_mac_verify(k, message, tag):
     return False
 
 def Gen(init):
-    key1 = get_random_bits(len(init))
-    key2 = get_random_bits(len(init))
+    """Generates two keys of length len(init)
+    Working:
+        uses a length doubling PRG to generate 2n bits and then, applies PRG on each part to obtain two keys
+    Args:
+        init (binary string - n bits): intitialization vector
+
+    Returns:
+        two binary strings: Returns two keys one for encryption and another for mac
+    """
+    key = gen(init)
+    init1, init2 = split_string(key)
+    key1 = PRG_single(init1)
+    key2 = PRG_single(init2)
     return key1, key2
 
 
 def Encrypt(k1, k2, message, CHUNK_LENGTH, PRIVATE_KEY):
+    """CCA Encryption Function
+    Working:
+        Uses encrypt() to generate cipher text and applies cbc mac on the cipher text
+    Args:
+        k1 (binary string - n bits): Key for CPA Encryption
+        k2 (binary string - n bits): Key for CBC MAC
+        message ( binarys string): message to be encrypted
+        CHUNK_LENGTH (int): Message Fragment size
+        PRIVATE_KEY (binary string - n bits): Private key chosen
+    Returns:
+        r(binary string - n bits): generated random bits after encryption using key k1
+        c(binary string): cipher text
+        tag(binary string nbits): tag for mac
+    """
     r, c = encrypt(k1, message, CHUNK_LENGTH, PRIVATE_KEY)
     tag = cbc_mac(k2, c)
     return r, c, tag
 
 
 def Decrypt(r, k2, cipher, CHUNK_LENGTH, PRIVATE_KEY, tag):
+    """Decryption using CPA decryptor and CBC MAC validator
+    Working:
+        Applies cbc_mac_verify on cipher text using key k2 and tag, and then decrypts only if mac verifies
+    Args:
+        r (binary string - n bits): key for CPA decryption
+        k2 (binary string - n bits): Key for CBC MAC
+        message ( binary string): message to be encrypted
+        CHUNK_LENGTH (int): Message Fragment size
+        PRIVATE_KEY (binary string - n bits): Private key chosen
+        tag (binary string - n bits): tag for mac verification
+
+    Returns:
+        binary string : decrypted message
+    """
     assert cbc_mac_verify(
         k2, cipher, tag), "Compromised message, Tag Mismatch"
     m = decrypt(r, cipher, CHUNK_LENGTH, PRIVATE_KEY)
     return m
 
+
 def start():
-    PRIVATE_KEY = str(input('Enter key in binary(16 bit recommended)\n'))
-    # own library that generates random bits using pseudo random generator
+    PRIVATE_KEY = str(input('Enter Private key in binary(16 bit recommended)\n'))
     message = str(input('Enter message example: Hello world\n'))
     orig_message = str_to_bin(message)
     print('BINARY MESSAGE:\n', orig_message)
     CHUNK_LENGTH = int(input('Enter size of fragment\n'))
-    nonce = get_random_bits(CHUNK_LENGTH)
-    print('Random nonce:\n', nonce)
-    r, c = encrypt(nonce, orig_message, CHUNK_LENGTH, PRIVATE_KEY)
+    init_vector = get_random_bits(CHUNK_LENGTH)
+    print('Random init vector:\n', init_vector)
+    k1, k2 = Gen(init_vector)
+    r, c, tag = Encrypt(k1, k2, orig_message, CHUNK_LENGTH, PRIVATE_KEY)
+    m = Decrypt(r, k2, c, CHUNK_LENGTH, PRIVATE_KEY, tag)
     print('Encrypted message:\n', c)
-    m = decrypt(r, c, CHUNK_LENGTH, PRIVATE_KEY)
     print('Decrypted message:\n', m)
     if orig_message == m:
-        print("CPA working")
+        print("CCA working")
         print('Decrypted message:\n', bin_to_str(m))
     else:
-        print("CPA Not Working")
+        print("CCA Not Working")
 
 start()
