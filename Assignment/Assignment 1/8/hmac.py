@@ -200,6 +200,7 @@ p, q, g, h = get_group_parameters()
 def start():
     SIZE = 16
     iv = dec_to_bin(getrandbits(SIZE), SIZE)
+    print(iv)
     message = str(input('Enter message in string like Hello world\n'))
     message_bin = str_to_bin(message)
     print(f"Binary message:\n{message_bin}")
